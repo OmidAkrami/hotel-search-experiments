@@ -2,6 +2,8 @@
 
 Expedia published 8 months of hotel search logs for a 2013 Kaggle competition: 9.9 million hotel impressions from 400,000 searches, with clicks, bookings and booking value. For about 30% of those searches Expedia showed the hotels in random order instead of its own ranking. That makes the file a real randomised experiment on position, which is what metasearch and travel sites sell (hotels bid for it on trivago, and Expedia's ranking team optimises it).
 
+In short: a hotel shown in slots 1-4 gets 77% more clicks and 87% more bookings than one in slots 6-10 (+68% to +77% across three ways of measuring it). Below slot 14, position barely matters. Checking a test every week pushes false positives from 5% to 29%, and an O'Brien-Fleming boundary brings it back to 5%. A geo test on three markets can detect a 15% lift in six weeks; one market needs about 30%, over eight weeks.
+
 I used it to work through a full experimentation workflow in SQL, with Python only where SQL runs out:
 
 1. checks before trusting anything (sampling, assignment, randomisation balance)
@@ -41,6 +43,8 @@ Random-order searches that show all nine slots 1-4 and 6-10 (107,238 searches; t
 | booking value per impression | $3.90 | $2.26 | +73% | +60% to +87% |
 | clicks that end in a booking | 12.0% | 11.3% | +6% | +2% to +11% |
 
+![Click-through by slot, random order and Expedia's ranking](docs/slot_curve.png)
+
 My first version used every random search, and short lists (say 7 hotels: four in slots 1-4, three in 6-10, since slot 5 is reserved) have a high click-through per hotel and land mostly in the top block. That version said +83% for click-through (83.2% vs 76.6%, `ab_list_length`), about 7 points of lift that came from list length.
 
 Checked against the location score 2 imbalance:
@@ -74,6 +78,8 @@ Same test split by segment, each level compared with the first level of its dime
 | 4+ nights | +71% | 3.8 |
 | on promotion | +64% | 4.3 |
 | not on promotion | +80% | 4.0 |
+
+![Lift of slots 1-4 over 6-10 by segment, relative and absolute](docs/segment_forest.png)
 
 On the relative scale, low-star, unreviewed and non-promoted hotels look much more sensitive to position. On the absolute scale that goes away or reverses: 1-2 star and 4-5 star hotels both gain 4.0 clicks per 100 impressions, and unreviewed and non-promoted hotels gain less than their comparison groups (below). Their relative lift is bigger only because they start from a lower base. A hotel paying for placement per click cares about the absolute gain; a forecast of "what happens to my clicks if I move up" uses the relative one.
 
@@ -157,6 +163,7 @@ scripts/
   prepare_data.py           data.zip -> data/train.parquet
   build.py                  runs sql/ and exports results
 notebooks/                  the Kaggle notebook
+docs/                       two charts from the notebook, used in this README
 ```
 
 ## Run it
