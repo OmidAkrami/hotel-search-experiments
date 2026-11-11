@@ -1,0 +1,12 @@
+data/
+*.zip
+*.csv
+*.parquet
+*.duckdb
+*.duckdb.wal
+results/
+dashboard/*.csv
+.ipynb_checkpoints/
+__pycache__/
+.venv/
+.DS_Store
